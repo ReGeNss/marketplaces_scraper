@@ -7,10 +7,9 @@ ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
 
 WORKDIR /home/site/wwwroot
 
-# Copy package.json and install packages before copying the rest of the code to enable caching
-COPY package.json package.json
-RUN npm install
+RUN apt-get install -y libglib2.0-0 libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libxkbcommon0 libpango-1.0-0 libcairo2 libasound2
+RUN apt-get install -y fonts-noto-cjk fonts-noto-color-emoji fonts-noto-core fonts-noto-ui-core
+COPY . /home/site/wwwroot
 
-# Copy the rest of the code
-COPY . .
-RUN  npm run build
+RUN cd /home/site/wwwroot && \
+    npm install

@@ -29,7 +29,7 @@ export async function scrapMarketplacesTrigger(myTimer: Timer, context: Invocati
 
 
 app.timer('scrapMarketplacesTrigger', {
-    // schedule: '0 */5 * * * *',
-    schedule: '0 * * * * *',
+    schedule: '0 */5 * * * *',
+    // schedule: '0 * * * * *',
     handler: scrapMarketplacesTrigger
 });

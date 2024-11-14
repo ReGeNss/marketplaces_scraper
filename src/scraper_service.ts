@@ -11,7 +11,8 @@ export class ScrapingService {
         return await puppeteer.launch({
             headless: true,
             args: ['--window-size=1920,1080','--no-sandbox', '--disable-setuid-sandbox','--disable-setuid-sandbox'],
-            executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\Chrome.exe',
+            // executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\Chrome.exe',
+            executablePath: './chrome-linux/chrome',
         })
     }
     scrapData: () => Promise<Product[]> =async () => {
