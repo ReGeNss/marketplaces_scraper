@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "@azure/functions": "^4.0.0",
-    "mongodb": "^6.10.0"
+    "mongodb": "^6.10.0",
+    "puppeteer-core": "^23.8.0"
   },
   "devDependencies": {
     "@types/node": "^20.x",
