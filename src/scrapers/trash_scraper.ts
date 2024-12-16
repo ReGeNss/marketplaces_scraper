@@ -1,15 +1,14 @@
 import { Browser } from 'puppeteer-core';
 import { Scraper } from './scraper';
 
-export class TrashScraper extends Scraper {
-  private siteUrl = 'https://thrash.ua/promotions';
-  private marketplace = 'Траш';
+const URL = 'https://thrash.ua/promotions';
+const MARKETPLACE = 'Траш';
 
+export class TrashScraper extends Scraper {
   public scrap = async (browser: Browser): Promise<Product[]> => {
     const page = await browser.newPage();
-    await page.goto(this.siteUrl);
+    await page.goto(URL);
     await this.wait(2000);
-    const marketplace = this.marketplace;
     const parsedData: Product[] = await page.evaluate((marketplace: string) => {
       const products: Product[] = [];
       const elements = document.querySelectorAll('.normal');
@@ -31,7 +30,7 @@ export class TrashScraper extends Scraper {
         products.push({ marketplace, title, currentPrice, oldPrice, imgSrc, volume: null });
       }
       return products;
-    }, marketplace);
+    }, MARKETPLACE);
     await page.close();
     return this.filterDuplicateProducts(parsedData);
   };
