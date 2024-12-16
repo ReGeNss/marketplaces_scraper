@@ -78,19 +78,8 @@ export class DataService {
       brands.push({ name: 'other', products: otherProductFiltered });
     }
     const extendedBrands = this.extendBrandsName(brands);
-    console.log('asdadada' + extendedBrands.length);
     const formatedBrands = this.otherProductSpecificate(extendedBrands);
-    console.log('formated'+  formatedBrands.length);
-    const a = this.brandsDuplicateDelete(formatedBrands);
-    console.log(a);
-    let e =0;
-    for (const brand of a) {
-      for (const product of brand.products) {
-        e+=1;
-      }
-    }
-    console.log(e);
-    return a;
+    return this.brandsDuplicateDelete(formatedBrands);
   };
 
   private extendBrandsName = (brands: Brand[]): Brand[] => {
@@ -149,7 +138,6 @@ export class DataService {
   };
 
   private brandsDuplicateDelete = (brands: Brand[]) => {
-    console.log('start brands' + brands.length);
     const specificatedBrands: Brand[] = [];
     while (brands.length > 0) {
       brands.forEach((brand) => {
@@ -167,7 +155,6 @@ export class DataService {
         }
       });
     }
-    console.log('end brands' + specificatedBrands.length);
     return specificatedBrands;
   };
 
@@ -181,9 +168,6 @@ export class DataService {
     };
   };
 
-
-
-
   private productDataNormalize = (products: Product[]) => {
     const regex = new RegExp(KEYWORDS.join('|'), 'gi');
     for (const product of products) {
@@ -191,9 +175,7 @@ export class DataService {
     }
     return products;
   };
-
-
-
+  
   private volumeParser = (products: Product[]) => {
     for (const product of products) {
       const title = product.title.toLowerCase();

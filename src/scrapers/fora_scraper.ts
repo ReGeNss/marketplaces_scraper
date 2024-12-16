@@ -23,7 +23,7 @@ export class ForaScraper extends Scraper {
         const currentPrice = currentPriceInt + '.' + currentPriceFraction;
 
         const oldPriceElement = pricesBloc.querySelector('.old-integer') as HTMLElement;
-        let oldPrice = null; // подумай нужно ли оно с налл
+        let oldPrice = null;
         if (oldPriceElement != null) {
           oldPrice = oldPriceElement.innerText;
         }

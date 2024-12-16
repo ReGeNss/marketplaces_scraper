@@ -17,7 +17,7 @@ export class ATBScraper extends Scraper {
         const pricesBloc = e.querySelector('.catalog-item__bottom') as HTMLElement;
         const currentPrice = (pricesBloc.querySelector('.product-price__top') as HTMLElement).innerText;
         const oldPriceElement = pricesBloc.querySelector('.product-price__bottom') as HTMLElement;
-        let oldPrice = null; // подумай нужно ли оно с налл
+        let oldPrice = null;
         if (oldPriceElement != null) {
           oldPrice = oldPriceElement.innerText;
         }

@@ -21,7 +21,7 @@ export class SilpoScraper extends Scraper {
         }
         const currentPrice = currentPriceElement.innerText;
         const oldPriceElement = e.querySelector('.ft-line-through') as HTMLElement;
-        let oldPrice = null; // подумай нужно ли оно с налл
+        let oldPrice = null;
         if (oldPriceElement != null) {
           oldPrice = oldPriceElement.innerText;
         }
@@ -33,7 +33,6 @@ export class SilpoScraper extends Scraper {
 
         const imgElement = e.querySelector('.product-card__top-inner') as HTMLElement;
         const imgSrc = (imgElement?.firstChild as HTMLElement)?.getAttribute('src');
-        // addProduct(products,{marketplace,title ,currentPrice, oldPrice,imgSrc, volume: null});
         products.push({ marketplace, title, currentPrice, oldPrice, imgSrc, volume: null });
       }
       return products;
