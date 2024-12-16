@@ -8,7 +8,7 @@ export async function scrapMarketplacesTrigger (myTimer: Timer, context: Invocat
   context.log('Starting scraping');
   const scraper = new ScrapingService();
   const dataService = new DataService();
-  const scrapedData = await scraper.scrapData();
+  const scrapedData = await scraper.scrapMarketplaces();
   const data = dataService.filterAndTransformData(scrapedData, MARKETPLACES);
   await dataService.saveData(data);
 }

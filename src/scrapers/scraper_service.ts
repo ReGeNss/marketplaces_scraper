@@ -7,7 +7,7 @@ import { TrashScraper } from './trash_scraper';
 import { NovusScraper } from './novus_scraper';
 
 export class ScrapingService {
-  private createBrowser:() => Promise<Browser> = async () => {
+  private createBrowser = async (): Promise<Browser> => {
     return await puppeteer.launch({
       headless: true,
       args: ['--window-size=1920,1080', '--no-sandbox', '--disable-setuid-sandbox', '--disable-setuid-sandbox'],
@@ -16,7 +16,7 @@ export class ScrapingService {
     });
   };
 
-  scrapData: () => Promise<Product[]> =async () => {
+  public scrapMarketplaces = async (): Promise<Product[]> => {
     const productArray: Product[] = [];
     const browser = await this.createBrowser();
 
@@ -31,7 +31,6 @@ export class ScrapingService {
     productArray.push(...await silpoScraper.scrap(browser));
     // productArray.push(... await trashScraper.scrap(browser));
     productArray.push(...await novusScraper.scrap(browser));
-    console.log('amount of products: ', productArray.length);
     return productArray;
   };
 

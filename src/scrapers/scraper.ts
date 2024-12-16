@@ -1,7 +1,7 @@
 export class Scraper {
-  wait:(ms:number) => Promise<void> = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  wait = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
-  filterDuplicateProducts = (products: Product[]) => {
+  public filterDuplicateProducts = (products: Product[]): Product[] => {
     const filteredProducts: Product[] = [];
     products.forEach((product) => {
       this.addProduct(filteredProducts, product);
@@ -9,7 +9,7 @@ export class Scraper {
     return filteredProducts;
   };
 
-  private addProduct = (products: Product[], newProduct: Product) => {
+  private addProduct = (products: Product[], newProduct: Product): void => {
     const isDuplicate = products.some((product) =>
       product.marketplace === newProduct.marketplace &&
             product.title === newProduct.title &&
