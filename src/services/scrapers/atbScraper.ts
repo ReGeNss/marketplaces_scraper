@@ -4,7 +4,7 @@ import { Scraper } from './scraper';
 const MARKETPLACE = 'ATB';
 const URL = 'https://www.atbmarket.com/catalog/364-yenergetichni';
 
-export class ATBScraper extends Scraper {
+export class AtbScraper extends Scraper {
   public scrap = async (browser: Browser): Promise<Product[]> => {
     const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36');

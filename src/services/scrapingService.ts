@@ -1,16 +1,16 @@
 import { Browser } from 'puppeteer-core';
 import puppeteer from 'puppeteer-core';
-import { ATBScraper } from './atb_scraper';
-import { ForaScraper } from './fora_scraper';
-import { SilpoScraper } from './silpo_scraper';
-import { TrashScraper } from './trash_scraper';
-import { NovusScraper } from './novus_scraper';
+import { AtbScraper } from './scrapers/atbScraper';
+import { ForaScraper } from './scrapers/foraScraper';
+import { SilpoScraper } from './scrapers/silpoScraper';
+import { TrashScraper } from './scrapers/trashScraper';
+import { NovusScraper } from './scrapers/novusScraper';
 
 export class ScrapingService {
   private createBrowser = async (): Promise<Browser> => {
     return await puppeteer.launch({
       headless: true,
-      args: ['--window-size=1920,1080', '--no-sandbox', '--disable-setuid-sandbox', '--disable-setuid-sandbox'],
+      args: ['--window-size=1920,1080', '--no-sandbox', '--disable-setuid-sandbox'],
       executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\Chrome.exe',
       // executablePath: './chrome-linux/chrome',
     });
@@ -20,7 +20,7 @@ export class ScrapingService {
     const productArray: Product[] = [];
     const browser = await this.createBrowser();
 
-    const atbScraper = new ATBScraper();
+    const atbScraper = new AtbScraper();
     const foraScraper = new ForaScraper();
     const silpoScraper = new SilpoScraper();
     const novusScraper = new NovusScraper();

@@ -1,5 +1,5 @@
 export class Scraper {
-  wait = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+  public wait = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
   public filterDuplicateProducts = (products: Product[]): Product[] => {
     const filteredProducts: Product[] = [];
