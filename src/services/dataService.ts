@@ -1,6 +1,5 @@
 import { MongoClient } from 'mongodb';
 
-const VOLUME_REGEXP = new RegExp(/(^|[^а-яА-Я])л([^а-яА-Я]|$)/i);
 const EMPTY_STRING = '';
 const MIN_PRODUCT_COUNT = 3;
 const MIN_BRAND_NAME_LENGTH = 2;
@@ -175,84 +174,36 @@ export class DataService {
   };
 
   private volumeParser = (products: Product[]) => {
-    for (const product of products) {
-      const title = product.title.toLowerCase();
-      if (title.includes('мл')) {
-        product.title = product.title.replace('мл', EMPTY_STRING).trim();
-      } else if (title.match(VOLUME_REGEXP)) {
-        product.title = product.title.replace(VOLUME_REGEXP, EMPTY_STRING).trim();
+    const numbersRegEpx = new RegExp(/\d+/g);
+    const symbolsRegEpx = new RegExp(/[.,:;!?@#%]+/g);
+    const litreVolumeRegExp = new RegExp(/(^|[^а-яА-Я])л([^а-яА-Я]|$)/i);
+    const floatVolumeRegExp = new RegExp(/(^|[^0-9])0\d+\s*л([^а-яА-Я]|$)/i);
+    const litreOrMillilitreVolumeRegExp = new RegExp(/(^|[^а-яА-Я])(л|мл)([^а-яА-Я]|$)/i);
 
-      }
-    }
     for (const product of products) {
-      const title = product.title.toLowerCase();
-      switch (true) {
-        case title.includes('500'):
-          product.title = product.title.replace('500', EMPTY_STRING).trim();
-          product.volume = '500 мл';
-          break;
-        case title.includes('0.5'):
-          product.title = product.title.replace('0.5', EMPTY_STRING).trim();
-          product.volume = '500 мл';
-          break;
-        case title.includes('0,5'):
-          product.title = product.title.replace('0,5', EMPTY_STRING).trim();
-          product.volume = '500 мл';
-          break;
-        case title.includes('250'):
-          product.title = product.title.replace('250', EMPTY_STRING).trim();
-          product.volume = '250 мл';
-          break;
-        case title.includes('0.25'):
-          product.title = product.title.replace('0.25', EMPTY_STRING).trim();
-          product.volume = '250 мл';
-          break;
-        case title.includes('0,25'):
-          product.title = product.title.replace('0,25', EMPTY_STRING).trim();
-          product.volume = '250 мл';
-          break;
-        case title.includes('0,33'):
-          product.title = product.title.replace('0,33', EMPTY_STRING).trim();
-          product.volume = '330 мл';
-          break;
-        case title.includes('330'):
-          product.title = product.title.replace('330', EMPTY_STRING).trim();
-          product.volume = '330 мл';
-          break;
-        case title.includes('0.33'):
-          product.title = product.title.replace('0.33', EMPTY_STRING).trim();
-          product.volume = '330 мл';
-          break;
-        case title.includes('1л'):
-          product.title = product.title.replace('1л', EMPTY_STRING).trim();
-          product.volume = '1 л';
-          break;
-        case title.includes('1'):
-          product.title = product.title.replace('1', EMPTY_STRING).trim();
-          product.volume = '1 л';
-          break;
-        case title.includes('0.75'):
-          product.title = product.title.replace('0.75', EMPTY_STRING).trim();
-          product.volume = '750 мл';
-          break;
-        case title.includes('0,75'):
-          product.title = product.title.replace('0,75', EMPTY_STRING).trim();
-          product.volume = '750 мл';
-          break;
-        case title.includes('750'):
-          product.title = product.title.replace('750', EMPTY_STRING).trim();
-          product.volume = '750 мл';
-          break;
-        case title.includes('355'):
-          product.title = product.title.replace('355', EMPTY_STRING).trim();
-          product.volume = '355 мл';
-          break;
-        case title.includes('473'):
-          product.title = product.title.replace('473', EMPTY_STRING).trim();
-          product.volume = '473 мл';
-          break;
+      product.title = product.title.replace(symbolsRegEpx, EMPTY_STRING);
+      if (product.title.match(floatVolumeRegExp)) {
+        const numbers = product.title.match(numbersRegEpx);
+        product.title = product.title.replace(numbersRegEpx, EMPTY_STRING).trim();
+        const volumeInString = numbers[numbers.length-1];
+
+        if (volumeInString.length === 3) {
+          product.volume = parseInt(volumeInString) * 10 + ' мл';
+        }else if (volumeInString.length === 2) {
+          product.volume = parseInt(volumeInString) * 100 + ' мл';
+        }else if (volumeInString.length > 3) {
+          product.volume = parseInt(volumeInString) + ' мл';
+        }
+      }else if (product.title.match(litreVolumeRegExp)) {
+        const volume = product.title.match(numbersRegEpx);
+        product.title = product.title.replace(numbersRegEpx, EMPTY_STRING).trim();
+        product.volume = volume[0] + ' л';
+      }else if (product.title.match(numbersRegEpx)) {
+        const volume = product.title.match(numbersRegEpx);
+        product.title = product.title.replace(numbersRegEpx, EMPTY_STRING).trim();
+        product.volume = volume[0] + ' мл';
       }
-      product.title = product.title.replace(/[\d.,:;!?@#]/g, EMPTY_STRING).trim();
+      product.title = product.title.replace(litreOrMillilitreVolumeRegExp,EMPTY_STRING).trim();
     }
     return products;
   };
