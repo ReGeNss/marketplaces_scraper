@@ -1,10 +1,10 @@
 import { MongoClient } from 'mongodb';
 
-const VOLUMEREGEXP = new RegExp(/(^|[^а-яА-Я])л([^а-яА-Я]|$)/i);
-const EMPTYSTRING = '';
-const MINPRODUCTCOUNT = 3;
-const MINBRANDNAMELENGTH = 2;
-const LENGTHOFBRANDNAMECHECK = 2;
+const VOLUME_REGEXP = new RegExp(/(^|[^а-яА-Я])л([^а-яА-Я]|$)/i);
+const EMPTY_STRING = '';
+const MIN_PRODUCT_COUNT = 3;
+const MIN_BRAND_NAME_LENGTH = 2;
+const LENGTH_OF_BRAND_NAME_CHECK = 2;
 
 const KEYWORDS  = [
   'напій',
@@ -41,30 +41,28 @@ export class DataService {
     await mongoClient.close();
   };
 
-
-
   private brandParser = (products: Product[]): Brand[] => {
     const brands: Brand[] = [];
     const otherProducts: Product[] = [];
     for (const product of products) {
       const splitedTitle = product.title.split(' ');
-      splitedTitle.splice(LENGTHOFBRANDNAMECHECK, splitedTitle.length-LENGTHOFBRANDNAMECHECK);
+      splitedTitle.splice(LENGTH_OF_BRAND_NAME_CHECK, splitedTitle.length-LENGTH_OF_BRAND_NAME_CHECK);
       let brandName = '';
 
       for (let word of splitedTitle) {
         word = word.trim();
         if (word.toLowerCase() === 'energy') continue;
-        const brandProducts: Product[] = [];
         if (word.includes('зі') || word.includes('смаком')) continue;
 
+        const brandProducts: Product[] = [];
         products.forEach((e) => {
           if (e.title.trim().toLowerCase().includes(word.toLowerCase())) {
             brandProducts.push(...products.splice(products.indexOf(e), 1));
           }
         });
-        if (brandProducts.length >= MINPRODUCTCOUNT) {
+        if (brandProducts.length >= MIN_PRODUCT_COUNT) {
           brandName += ' ' + word;
-          if (brandName.length <= MINBRANDNAMELENGTH)  continue;
+          if (brandName.length <= MIN_BRAND_NAME_LENGTH)  continue;
           brands.push({ name: brandName, products: brandProducts });
           break;
         } else {
@@ -171,18 +169,18 @@ export class DataService {
   private productDataNormalize = (products: Product[]) => {
     const regex = new RegExp(KEYWORDS.join('|'), 'gi');
     for (const product of products) {
-      product.title = product.title.normalize('NFC').replace(regex, EMPTYSTRING).trim();
+      product.title = product.title.normalize('NFC').replace(regex, EMPTY_STRING).trim();
     }
     return products;
   };
-  
+
   private volumeParser = (products: Product[]) => {
     for (const product of products) {
       const title = product.title.toLowerCase();
       if (title.includes('мл')) {
-        product.title = product.title.replace('мл', EMPTYSTRING).trim();
-      } else if (title.match(VOLUMEREGEXP)) {
-        product.title = product.title.replace(VOLUMEREGEXP, EMPTYSTRING).trim();
+        product.title = product.title.replace('мл', EMPTY_STRING).trim();
+      } else if (title.match(VOLUME_REGEXP)) {
+        product.title = product.title.replace(VOLUME_REGEXP, EMPTY_STRING).trim();
 
       }
     }
@@ -190,71 +188,71 @@ export class DataService {
       const title = product.title.toLowerCase();
       switch (true) {
         case title.includes('500'):
-          product.title = product.title.replace('500', EMPTYSTRING).trim();
+          product.title = product.title.replace('500', EMPTY_STRING).trim();
           product.volume = '500 мл';
           break;
         case title.includes('0.5'):
-          product.title = product.title.replace('0.5', EMPTYSTRING).trim();
+          product.title = product.title.replace('0.5', EMPTY_STRING).trim();
           product.volume = '500 мл';
           break;
         case title.includes('0,5'):
-          product.title = product.title.replace('0,5', EMPTYSTRING).trim();
+          product.title = product.title.replace('0,5', EMPTY_STRING).trim();
           product.volume = '500 мл';
           break;
         case title.includes('250'):
-          product.title = product.title.replace('250', EMPTYSTRING).trim();
+          product.title = product.title.replace('250', EMPTY_STRING).trim();
           product.volume = '250 мл';
           break;
         case title.includes('0.25'):
-          product.title = product.title.replace('0.25', EMPTYSTRING).trim();
+          product.title = product.title.replace('0.25', EMPTY_STRING).trim();
           product.volume = '250 мл';
           break;
         case title.includes('0,25'):
-          product.title = product.title.replace('0,25', EMPTYSTRING).trim();
+          product.title = product.title.replace('0,25', EMPTY_STRING).trim();
           product.volume = '250 мл';
           break;
         case title.includes('0,33'):
-          product.title = product.title.replace('0,33', EMPTYSTRING).trim();
+          product.title = product.title.replace('0,33', EMPTY_STRING).trim();
           product.volume = '330 мл';
           break;
         case title.includes('330'):
-          product.title = product.title.replace('330', EMPTYSTRING).trim();
+          product.title = product.title.replace('330', EMPTY_STRING).trim();
           product.volume = '330 мл';
           break;
         case title.includes('0.33'):
-          product.title = product.title.replace('0.33', EMPTYSTRING).trim();
+          product.title = product.title.replace('0.33', EMPTY_STRING).trim();
           product.volume = '330 мл';
           break;
         case title.includes('1л'):
-          product.title = product.title.replace('1л', EMPTYSTRING).trim();
+          product.title = product.title.replace('1л', EMPTY_STRING).trim();
           product.volume = '1 л';
           break;
         case title.includes('1'):
-          product.title = product.title.replace('1', EMPTYSTRING).trim();
+          product.title = product.title.replace('1', EMPTY_STRING).trim();
           product.volume = '1 л';
           break;
         case title.includes('0.75'):
-          product.title = product.title.replace('0.75', EMPTYSTRING).trim();
+          product.title = product.title.replace('0.75', EMPTY_STRING).trim();
           product.volume = '750 мл';
           break;
         case title.includes('0,75'):
-          product.title = product.title.replace('0,75', EMPTYSTRING).trim();
+          product.title = product.title.replace('0,75', EMPTY_STRING).trim();
           product.volume = '750 мл';
           break;
         case title.includes('750'):
-          product.title = product.title.replace('750', EMPTYSTRING).trim();
+          product.title = product.title.replace('750', EMPTY_STRING).trim();
           product.volume = '750 мл';
           break;
         case title.includes('355'):
-          product.title = product.title.replace('355', EMPTYSTRING).trim();
+          product.title = product.title.replace('355', EMPTY_STRING).trim();
           product.volume = '355 мл';
           break;
         case title.includes('473'):
-          product.title = product.title.replace('473', EMPTYSTRING).trim();
+          product.title = product.title.replace('473', EMPTY_STRING).trim();
           product.volume = '473 мл';
           break;
       }
-      product.title = product.title.replace(/[\d.,:;!?@#]/g, EMPTYSTRING).trim();
+      product.title = product.title.replace(/[\d.,:;!?@#]/g, EMPTY_STRING).trim();
     }
     return products;
   };
