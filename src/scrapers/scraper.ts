@@ -1,3 +1,5 @@
+import {Product} from "../data/types";
+
 export class Scraper {
   public wait = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 

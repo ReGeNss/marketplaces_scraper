@@ -1,5 +1,6 @@
 import { Browser } from 'puppeteer-core';
 import { Scraper } from './scraper';
+import { Product } from '../data/types';
 
 const MARKETPLACE = 'ATB';
 const URL = 'https://www.atbmarket.com/catalog/364-yenergetichni';
