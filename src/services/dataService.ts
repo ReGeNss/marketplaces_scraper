@@ -4,6 +4,11 @@ const EMPTY_STRING = '';
 const MIN_PRODUCT_COUNT = 3;
 const MIN_BRAND_NAME_LENGTH = 2;
 const LENGTH_OF_BRAND_NAME_CHECK = 2;
+const NUMBERS_REG_EXP = new RegExp(/\d+/g);
+const LITERS = 'л';
+const MILLILITERS = 'мл';
+const MAX_VOLUME_LENGTH = 4;
+const BASE_MULTIPLIER = 10;
 
 const KEYWORDS  = [
   'напій',
@@ -173,8 +178,7 @@ export class DataService {
     return products;
   };
 
-  private volumeParser = (products: Product[]) => {
-    const numbersRegEpx = new RegExp(/\d+/g);
+  private volumeParser = (products: Product[]): Product[] => {
     const symbolsRegEpx = new RegExp(/[.,:;!?@#%]+/g);
     const litreVolumeRegExp = new RegExp(/(^|[^а-яА-Я])л([^а-яА-Я]|$)/i);
     const floatVolumeRegExp = new RegExp(/(^|[^0-9])0\d+\s*л([^а-яА-Я]|$)/i);
@@ -183,28 +187,28 @@ export class DataService {
     for (const product of products) {
       product.title = product.title.replace(symbolsRegEpx, EMPTY_STRING);
       if (product.title.match(floatVolumeRegExp)) {
-        const numbers = product.title.match(numbersRegEpx);
-        product.title = product.title.replace(numbersRegEpx, EMPTY_STRING).trim();
+        const numbers = product.title.match(NUMBERS_REG_EXP);
+        product.title = product.title.replace(NUMBERS_REG_EXP, EMPTY_STRING).trim();
         const volumeInString = numbers[numbers.length-1];
-
-        if (volumeInString.length === 3) {
-          product.volume = parseInt(volumeInString) * 10 + ' мл';
-        }else if (volumeInString.length === 2) {
-          product.volume = parseInt(volumeInString) * 100 + ' мл';
-        }else if (volumeInString.length > 3) {
-          product.volume = parseInt(volumeInString) + ' мл';
-        }
+        product.volume = this.volumeDimensionalityFormatter(volumeInString);
       }else if (product.title.match(litreVolumeRegExp)) {
-        const volume = product.title.match(numbersRegEpx);
-        product.title = product.title.replace(numbersRegEpx, EMPTY_STRING).trim();
-        product.volume = volume[0] + ' л';
-      }else if (product.title.match(numbersRegEpx)) {
-        const volume = product.title.match(numbersRegEpx);
-        product.title = product.title.replace(numbersRegEpx, EMPTY_STRING).trim();
-        product.volume = volume[0] + ' мл';
+        this.assingVolume(product, LITERS);
+      }else if (product.title.match(NUMBERS_REG_EXP)) {
+        this.assingVolume(product, MILLILITERS);
       }
       product.title = product.title.replace(litreOrMillilitreVolumeRegExp,EMPTY_STRING).trim();
     }
     return products;
   };
+
+  private volumeDimensionalityFormatter = (volume: string ): string => {
+     const multiplier = Math.pow(BASE_MULTIPLIER, MAX_VOLUME_LENGTH - volume.length);
+     return parseInt(volume) * multiplier + ' ' + MILLILITERS;
+  }
+
+  private assingVolume = (product: Product, measurementUnit: string): void => {
+    const volume = product.title.match(NUMBERS_REG_EXP);
+    product.title = product.title.replace(NUMBERS_REG_EXP, EMPTY_STRING).trim();
+    product.volume = volume[0] + ' ' + measurementUnit;
+  }
 }
