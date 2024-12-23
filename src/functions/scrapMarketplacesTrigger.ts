@@ -1,15 +1,15 @@
 import { app, InvocationContext, Timer } from '@azure/functions';
-import { ScrapingService } from '../services/scrapingService';
-import { DataService } from '../services/dataService';
+import { ScrapingService } from '../scrapers/scrapingService';
+import dataParser from '../data/dataParser';
+import { saveData } from '../data/dataRepository';
 
 const MARKETPLACES = ['ATB', 'Фора', 'Сільпо', 'Новус'];
 
 export async function scrapMarketplacesTrigger (myTimer: Timer, context: InvocationContext): Promise<void> {
   const scraper = new ScrapingService();
-  const dataService = new DataService();
   const scrapedData = await scraper.scrapMarketplaces();
-  const data = dataService.filterAndTransformData(scrapedData, MARKETPLACES);
-  await dataService.saveData(data);
+  const data = dataParser(scrapedData, MARKETPLACES);
+  await saveData(data);
 }
 
 app.timer('scrapMarketplacesTrigger', {

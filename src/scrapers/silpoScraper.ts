@@ -1,5 +1,6 @@
 import { Browser } from 'puppeteer-core';
 import { Scraper } from './scraper';
+import { Product } from '../data/types';
 
 const URL = 'https://silpo.ua/category/energetychni-napoi-59';
 const MARKETPLACE = 'Сільпо';

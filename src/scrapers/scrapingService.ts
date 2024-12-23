@@ -1,10 +1,11 @@
 import { Browser } from 'puppeteer-core';
 import puppeteer from 'puppeteer-core';
-import { AtbScraper } from './scrapers/atbScraper';
-import { ForaScraper } from './scrapers/foraScraper';
-import { SilpoScraper } from './scrapers/silpoScraper';
-import { TrashScraper } from './scrapers/trashScraper';
-import { NovusScraper } from './scrapers/novusScraper';
+import { AtbScraper } from './atbScraper';
+import { ForaScraper } from './foraScraper';
+import { SilpoScraper } from './silpoScraper';
+import { TrashScraper } from './trashScraper';
+import { NovusScraper } from './novusScraper';
+import { Product } from '../data/types';
 
 export class ScrapingService {
   private createBrowser = async (): Promise<Browser> => {
