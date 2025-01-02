@@ -5,20 +5,20 @@ export class Scraper {
 
   public filterDuplicateProducts = (products: Product[]): Product[] => {
     const filteredProducts: Product[] = [];
-    products.forEach((product) => {
+    for(const product of products) {
       this.addProduct(filteredProducts, product);
-    });
+    }
     return filteredProducts;
   };
 
   private addProduct = (products: Product[], newProduct: Product): void => {
     const isDuplicate = products.some((product) =>
       product.marketplace === newProduct.marketplace &&
-            product.title === newProduct.title &&
-            product.currentPrice === newProduct.currentPrice &&
-            product.oldPrice === newProduct.oldPrice &&
-            product.imgSrc === newProduct.imgSrc &&
-            product.volume === newProduct.volume,
+      product.title === newProduct.title &&
+      product.currentPrice === newProduct.currentPrice &&
+      product.oldPrice === newProduct.oldPrice &&
+      product.imgSrc === newProduct.imgSrc &&
+      product.volume === newProduct.volume,
     );
 
     if (!isDuplicate) {

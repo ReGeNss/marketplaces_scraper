@@ -4,14 +4,16 @@ import { Product } from '../data/types';
 
 const URL = 'https://silpo.ua/category/energetychni-napoi-59';
 const MARKETPLACE = 'Сільпо';
+const FOUR_SECONDS = 4000;
+const TWO_SECONDS = 2000;
 
 export class SilpoScraper extends Scraper {
   public scrap = async (browser: Browser): Promise<Product[]> => {
     const page = await browser.newPage();
     await page.goto(URL);
-    await this.wait(4000);
+    await this.wait(FOUR_SECONDS);
     await page.click('body > sf-shop-silpo-root > shop-silpo-root-shell > silpo-shell-main > div > div.main__body > silpo-category > silpo-catalog > div > div.container.catalog__products > div > ecomui-pagination > div > button > div');
-    await this.wait(2000);
+    await this.wait(TWO_SECONDS);
     const parsedData: Product[] = await page.evaluate((marketplace) => {
       const products: Product[] = [];
       const elements = document.querySelectorAll('.ng-star-inserted');
@@ -23,11 +25,11 @@ export class SilpoScraper extends Scraper {
         const currentPrice = currentPriceElement.innerText;
         const oldPriceElement = e.querySelector('.ft-line-through') as HTMLElement;
         let oldPrice = null;
-        if (oldPriceElement != null) {
+        if (oldPriceElement) {
           oldPrice = oldPriceElement.innerText;
         }
         const titleElement = e.querySelector('.product-card__title') as HTMLElement;
-        if (titleElement == null) {
+        if (!titleElement) {
           continue;
         }
         const title:string = titleElement.innerText;
