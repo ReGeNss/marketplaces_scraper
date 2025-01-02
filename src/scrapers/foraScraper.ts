@@ -4,18 +4,19 @@ import { Product } from '../data/types';
 
 const URL = 'https://fora.ua/category/energetychni-napoi-2486';
 const MARKETPLACE = 'Фора';
+const TWO_SECONDS = 2000;
 
 export class ForaScraper extends Scraper {
   public scrap = async (browser: Browser): Promise<Product[]> => {
     const page = await browser.newPage();
     await page.goto(URL);
-    await this.wait(2000);
+    await this.wait(TWO_SECONDS);
     const parsedData = await page.evaluate((marketplace: string) => {
       const products:Product[] = [];
       const elements = document.querySelectorAll('.product-list-item');
       for (const e of elements) {
         const pricesBloc = e.querySelector('.product-price-container') as HTMLElement;
-        if (pricesBloc == null) {
+        if (!pricesBloc) {
           continue;
         }
         const currentPriceInt = (pricesBloc.querySelector('.current-integer') as HTMLElement).innerText;
@@ -25,7 +26,7 @@ export class ForaScraper extends Scraper {
 
         const oldPriceElement = pricesBloc.querySelector('.old-integer') as HTMLElement;
         let oldPrice = null;
-        if (oldPriceElement != null) {
+        if (oldPriceElement) {
           oldPrice = oldPriceElement.innerText;
         }
         const titleElement = e.querySelector('.product-title') as HTMLElement;

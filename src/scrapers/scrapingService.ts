@@ -7,19 +7,18 @@ import { TrashScraper } from './trashScraper';
 import { NovusScraper } from './novusScraper';
 import { Product } from '../data/types';
 
-export class ScrapingService {
-  private createBrowser = async (): Promise<Browser> => {
+  const createBrowser = async (): Promise<Browser> => {
     return await puppeteer.launch({
       headless: true,
       args: ['--window-size=1920,1080', '--no-sandbox', '--disable-setuid-sandbox'],
-      executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\Chrome.exe',
-      // executablePath: './chrome-linux/chrome',
+      // executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\Chrome.exe',
+      executablePath: './chrome-linux/chrome',
     });
   };
 
-  public scrapMarketplaces = async (): Promise<Product[]> => {
+  export const scrapMarketplaces = async (): Promise<Product[]> => {
     const productArray: Product[] = [];
-    const browser = await this.createBrowser();
+    const browser = await createBrowser();
 
     const atbScraper = new AtbScraper();
     const foraScraper = new ForaScraper();
@@ -34,6 +33,4 @@ export class ScrapingService {
     productArray.push(...await novusScraper.scrap(browser));
     return productArray;
   };
-
-}
 
