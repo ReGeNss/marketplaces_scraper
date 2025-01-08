@@ -16,25 +16,23 @@ export class SilpoScraper extends Scraper {
     await this.wait(TWO_SECONDS);
     const parsedData: Product[] = await page.evaluate((marketplace) => {
       const products: Product[] = [];
-      const elements = document.querySelectorAll('.ng-star-inserted');
+      const elements = document.querySelectorAll<HTMLElement>('.ng-star-inserted');
       for (const e of elements) {
-        const currentPriceElement = e.querySelector('.ft-whitespace-nowrap') as HTMLElement;
+        const currentPriceElement = e.querySelector<HTMLElement>('.ft-whitespace-nowrap');
         if (currentPriceElement == null) {
           continue;
         }
-        const currentPrice = currentPriceElement.innerText;
-        const oldPriceElement = e.querySelector('.ft-line-through') as HTMLElement;
-        let oldPrice = null;
-        if (oldPriceElement) {
-          oldPrice = oldPriceElement.innerText;
-        }
-        const titleElement = e.querySelector('.product-card__title') as HTMLElement;
+        const currentPrice = currentPriceElement?.innerText;
+        const oldPriceElement = e.querySelector<HTMLElement>('.ft-line-through');
+        const oldPrice = oldPriceElement?.innerText ?? null;
+
+        const titleElement = e.querySelector<HTMLElement>('.product-card__title');
         if (!titleElement) {
           continue;
         }
-        const title:string = titleElement.innerText;
+        const title = titleElement.innerText;
 
-        const imgElement = e.querySelector('.product-card__top-inner') as HTMLElement;
+        const imgElement = e.querySelector<HTMLElement>('.product-card__top-inner');
         const imgSrc = (imgElement?.firstChild as HTMLElement)?.getAttribute('src');
         products.push({ marketplace, title, currentPrice, oldPrice, imgSrc, volume: null });
       }

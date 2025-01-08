@@ -14,20 +14,21 @@ export class AtbScraper extends Scraper {
     await this.wait(THREE_SECONDS);
     const parsedData = await page.evaluate((marketplace: string) => {
       const products:Product[] =[];
-      const elements = document.querySelectorAll('.catalog-item');
+      const elements = document.querySelectorAll<HTMLElement>('.catalog-item');
       for (const e of elements) {
-        const pricesBloc = e.querySelector('.catalog-item__bottom') as HTMLElement;
-        const currentPrice = (pricesBloc.querySelector('.product-price__top') as HTMLElement).innerText;
-        const oldPriceElement = pricesBloc.querySelector('.product-price__bottom') as HTMLElement;
-        let oldPrice = null;
-        if (oldPriceElement) {
-          oldPrice = oldPriceElement.innerText;
-        }
-        const titleElement = e.querySelector('.catalog-item__title') as HTMLElement;
-        let title = titleElement.innerText ?? null;
+        const pricesBloc = e.querySelector<HTMLElement>('.catalog-item__bottom');
+        const currentPrice = pricesBloc.querySelector<HTMLElement>('.product-price__top')?.innerText;
+        const oldPriceElement = pricesBloc.querySelector<HTMLElement>('.product-price__bottom');
+        const oldPrice = oldPriceElement?.innerText ?? null;
 
-        const imgElement = e.querySelector('.catalog-item__img') as HTMLElement;
-        const imgSrc = imgElement.getAttribute('src') ?? '';
+        const titleElement = e.querySelector<HTMLElement>('.catalog-item__title');
+        if(!titleElement) {
+          continue;
+        }
+        const title = titleElement.innerText;
+
+        const imgElement = e.querySelector<HTMLElement>('.catalog-item__img');
+        const imgSrc = imgElement?.getAttribute('src');
         products.push({ marketplace, title, currentPrice, oldPrice, imgSrc, volume: null });
       }
       return products;
