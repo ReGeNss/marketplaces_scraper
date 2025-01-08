@@ -15,19 +15,19 @@ export class TrashScraper extends Scraper {
       const products: Product[] = [];
       const elements = document.querySelectorAll('.normal');
       for (const e of elements) {
-        const currentPriceInteger = (e.querySelector('.current-integer') as HTMLElement).innerText;
-        const currentPriceFraction = (e.querySelector('.current-fraction') as HTMLElement).innerText;
+        const currentPriceInteger = e.querySelector<HTMLElement>('.current-integer').innerText;
+        const currentPriceFraction = e.querySelector<HTMLElement>('.current-fraction').innerText;
 
-        const oldPriceInteger = (e.querySelector('.old-integer') as HTMLElement).innerText;
-        const oldPriceFraction = (e.querySelector('.old-fraction') as HTMLElement).innerText;
+        const oldPriceInteger = e.querySelector<HTMLElement>('.old-integer').innerText;
+        const oldPriceFraction = e.querySelector<HTMLElement>('.old-fraction').innerText;
 
         const currentPrice = currentPriceInteger + '.' + currentPriceFraction;
         const oldPrice = oldPriceInteger + '.' + oldPriceFraction;
 
-        const titleElement = e.querySelector('.product-title') as HTMLElement;
+        const titleElement = e.querySelector<HTMLElement>('.product-title');
         const title = titleElement.innerText;
 
-        const imgElement = e.querySelector('.product-img') as HTMLElement;
+        const imgElement = e.querySelector<HTMLElement>('.product-img');
         const imgSrc = imgElement.getAttribute('src');
         products.push({ marketplace, title, currentPrice, oldPrice, imgSrc, volume: null });
       }

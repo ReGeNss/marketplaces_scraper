@@ -14,32 +14,29 @@ export class NovusScraper extends Scraper {
     await this.wait(FOUR_SECONDS);
     for (let i = 0 ; i < PAGEDOWN_COUNT ; i++) {
       await page.click('#PageWrapBody_desktopMode > div.jsx-e14abeb0dec5e794.CategoryProductBox__loadMore > button');
-      await this.wait(4000);
+      await this.wait(FOUR_SECONDS);
     }
     const parsedData: Product[] = await page.evaluate((marketplace) => {
       const products: Product[] = [];
-      const elements = document.querySelectorAll('.ProductsBox__listItem');
+      const elements = document.querySelectorAll<HTMLElement>('.ProductsBox__listItem');
       for (const e of elements) {
-        const currentPriceElement = e.querySelector('.Price__value_caption') as HTMLElement;
+        const currentPriceElement = e.querySelector<HTMLElement>('.Price__value_caption');
         if (!currentPriceElement) {
           continue;
         }
-        const currentPrice = currentPriceElement.innerText;
-        const oldPriceElement = e.querySelector('.Price__value_body') as HTMLElement;
-        let oldPrice = null;
-        if (oldPriceElement) {
-          oldPrice = oldPriceElement.innerText;
-        }
-        const titleElement = e.querySelector('.ProductTile__title') as HTMLElement;
+        const currentPrice = currentPriceElement?.innerText;
+        const oldPriceElement = e.querySelector<HTMLElement>('.Price__value_body');
+        const oldPrice = oldPriceElement?.innerText ?? null;
+
+        const titleElement = e.querySelector<HTMLElement>('.ProductTile__title');
         if (!titleElement) {
           continue;
         }
         const title = titleElement.innerText;
 
-        const imgElement = e.querySelector('.ProductTile__imageContainer') as HTMLElement;
+        const imgElement = e.querySelector<HTMLElement>('.ProductTile__imageContainer');
         const imgSrc = (imgElement?.firstChild as HTMLElement)?.getAttribute('src');
         products.push({ marketplace, title, currentPrice, oldPrice, imgSrc, volume: null });
-
       }
       return products;
     }, MARKETPLACE);

@@ -13,26 +13,27 @@ export class ForaScraper extends Scraper {
     await this.wait(TWO_SECONDS);
     const parsedData = await page.evaluate((marketplace: string) => {
       const products:Product[] = [];
-      const elements = document.querySelectorAll('.product-list-item');
+      const elements = document.querySelectorAll<HTMLElement>('.product-list-item');
       for (const e of elements) {
-        const pricesBloc = e.querySelector('.product-price-container') as HTMLElement;
+        const pricesBloc = e.querySelector<HTMLElement>('.product-price-container');
         if (!pricesBloc) {
           continue;
         }
-        const currentPriceInt = (pricesBloc.querySelector('.current-integer') as HTMLElement).innerText;
-        const currentPriceFractionElement = pricesBloc.querySelector('.current-fraction') as HTMLElement;
-        const currentPriceFraction = currentPriceFractionElement.innerText ;
+        const currentPriceInt = pricesBloc.querySelector<HTMLElement>('.current-integer').innerText;
+        const currentPriceFractionElement = pricesBloc.querySelector<HTMLElement>('.current-fraction');
+        const currentPriceFraction = currentPriceFractionElement?.innerText ;
         const currentPrice = currentPriceInt + '.' + currentPriceFraction;
 
-        const oldPriceElement = pricesBloc.querySelector('.old-integer') as HTMLElement;
-        let oldPrice = null;
-        if (oldPriceElement) {
-          oldPrice = oldPriceElement.innerText;
+        const oldPriceElement = pricesBloc.querySelector<HTMLElement>('.old-integer');
+        const oldPrice = oldPriceElement?.innerText ?? null;
+
+        const titleElement = e.querySelector<HTMLElement>('.product-title');
+        if (!titleElement) {
+          continue;
         }
-        const titleElement = e.querySelector('.product-title') as HTMLElement;
         const title = titleElement.innerText;
 
-        const imgElement = e.querySelector('.product-list-item__image') as HTMLElement;
+        const imgElement = e.querySelector<HTMLElement>('.product-list-item__image');
         const imgSrc = imgElement.getAttribute('src');
         products.push({ marketplace, title, currentPrice, oldPrice, imgSrc, volume: null });
       }
@@ -41,5 +42,4 @@ export class ForaScraper extends Scraper {
     await page.close();
     return this.filterDuplicateProducts(parsedData);
   };
-
 }
