@@ -1,11 +1,6 @@
 export interface Data {
   marketplaces: string[],
-  brands: Brand[];
-}
-
-export interface Brand {
-  name: string,
-  products: Product[];
+  brands: Map<string, Product[]>
 }
 
 export interface Product {

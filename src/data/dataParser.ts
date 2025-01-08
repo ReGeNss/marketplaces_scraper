@@ -1,9 +1,7 @@
-import { Brand, Data, Product } from './types';
+import { Data, Product } from './types';
 
 const EMPTY_STRING = '';
-const MIN_PRODUCT_COUNT = 3;
-const MIN_BRAND_NAME_LENGTH = 2;
-const LENGTH_OF_BRAND_NAME_CHECK = 2;
+const MIN_PRODUCT_COUNT = 2;
 const NUMBERS_REG_EXP = new RegExp(/\d+/g);
 const LITERS = 'л';
 const MILLILITERS = 'мл';
@@ -20,6 +18,7 @@ const KEYWORDS  = [
   'гaзoвaний',
   'ж/б',
   'eнepгeтичний',
+  'енергетик',
   'та',
   'сильногазований',
   'ПЕТ',
@@ -27,122 +26,46 @@ const KEYWORDS  = [
   'середньогазований',
 ];
 
-const brandParser = (products: Product[]): Brand[] => {
-  const brands: Brand[] = [];
-  const otherProducts: Product[] = [];
+const brandParser = (products: Product[]): Map<string, Product[]> => {
+  const brands: Map<string, Product[]> = new Map();
   for (const product of products) {
-    const splitedTitle = product.title.split(' ');
-    splitedTitle.splice(LENGTH_OF_BRAND_NAME_CHECK, splitedTitle.length-LENGTH_OF_BRAND_NAME_CHECK);
-    let brandName = '';
-
-    for (let word of splitedTitle) {
-      word = word.trim();
-      if (word.toLowerCase() === 'energy') continue;
-      if (word.includes('зі') || word.includes('смаком')) continue;
-
-      const brandProducts: Product[] = [];
-      for (const product of products) {
-        if (product.title.trim().toLowerCase().includes(word.toLowerCase())) {
-          brandProducts.push(...products.splice(products.indexOf(product), 1));
-        }
-      }
-      if (brandProducts.length >= MIN_PRODUCT_COUNT) {
-        brandName += ' ' + word;
-        if (brandName.length <= MIN_BRAND_NAME_LENGTH)  continue;
-        brands.push({ name: brandName, products: brandProducts });
-        break;
-      } else {
-        otherProducts.push(product);
-      }
-    }
-  }
-
-  if (products.length > 0) {
-    const otherProductFiltered = otherProductDuplicateRemove([...products, ...otherProducts]);
-    brands.push({ name: 'other', products: otherProductFiltered });
-  }
-  const extendedBrands = extendBrandsName(brands);
-  const formatedBrands = otherProductSpecificate(extendedBrands);
-  return brandsDuplicateDelete(formatedBrands);
-};
-
-const extendBrandsName = (brands: Brand[]): Brand[] => {
-  const indexOfOther = brands.findIndex((e) => e.name.toLowerCase().includes('other'));
-  const otherProducts = brands.splice(indexOfOther, 1);
-  for (const brand of brands) {
-    const products = brand.products;
-    let extendedName = '';
-    const splitedProductName = brand.products[0].title.split(' ');
-    for (const part of splitedProductName) {
-      if (products.every((product) => product.title.toLowerCase().includes(part.toLowerCase()))) {
-        extendedName+= ' ' + part;
-      }
-    }
-    if (extendedName !== '') {
-      brand.name = extendedName.trim();
-    }
-  }
-  brands.push(...otherProducts);
-  return brands;
-};
-
-const otherProductDuplicateRemove = (products: Product[]): Product[] => {
-  const filteredProducts: Product[] = [];
-  for (const product of products) {
-    const isDuplicate = filteredProducts.some((oldProduct) =>
-      oldProduct.marketplace === product.marketplace &&
-        oldProduct.title === product.title &&
-        oldProduct.currentPrice === product.currentPrice &&
-        oldProduct.oldPrice === product.oldPrice &&
-        oldProduct.imgSrc === product.imgSrc &&
-        oldProduct.volume === product.volume,
-    );
-    if (!isDuplicate) {
-      filteredProducts.push(product);
-    }
-  }
-  return filteredProducts;
-};
-
-const otherProductSpecificate = (brands: Brand[]): Brand[] => {
-  const otherProductsToValidate = brands.find((e) => e.name === 'other')?.products;
-  if (otherProductsToValidate === undefined) return brands;
-  const otherProducts = [...otherProductsToValidate];
-  for (const product of otherProducts) {
     const splitedTitle = product.title.toLowerCase().split(' ');
-    for (const brand of brands) {
-      if (brand.name.toLowerCase().includes(splitedTitle[0])) {
-        otherProductsToValidate.splice(otherProductsToValidate.indexOf(product), 1);
-        brand.products.push(product);
-        break;
-      }
+    if (brands[splitedTitle[0]]) {
+      brands[splitedTitle[0]].push(product);
+      continue;
+    }
+    brands[splitedTitle[0]]= [product];
+  }
+
+  brands['other'] = [];
+  for (const brand in brands) {
+    if (brands[brand].length < MIN_PRODUCT_COUNT) {
+      brands['other'] = [...brands[brand], ...brands['other'] ];
+      delete brands[brand];
     }
   }
-  return brands;
+
+  return extendBrandsName(brands);
 };
 
-const brandsDuplicateDelete = (brands: Brand[]) => {
-  const specificatedBrands: Brand[] = [];
-  while (brands.length > 0) {
-    for (const formatingBrand of brands) {
-      const formatedBrandName = formatingBrand.name.toLowerCase().split(' ')[0];
-      brands.splice(brands.indexOf(formatingBrand), 1);
-      for (const brand of brands) {
-        if (brand.name.trim().toLowerCase().includes(formatedBrandName)) {
-          brand.products.push(...brand.products);
-          specificatedBrands.push({ name: brand.name, products: brand.products });
-          brands.splice(brands.indexOf(brand), 1);
-        }
-      }
-      const isBrandFiltered = specificatedBrands.find(
-        (filteredBrand) => filteredBrand.name.toLowerCase() === formatingBrand.name.toLowerCase(),
-      );
-      if (!isBrandFiltered) {
-        specificatedBrands.push(formatingBrand);
+const extendBrandsName = (brands: Map<string, Product[]>): Map<string, Product[]> => {
+  const brandsWithExtendedNames = new Map();
+  for (const brand in brands) {
+    const products = brands[brand];
+    let extendedName = '';
+    const splitedProductName = brands[brand][0].title.toLowerCase().split(' ');
+    for (const part of splitedProductName) {
+      if (products.every((product: Product) => product.title.toLowerCase().includes(part))) {
+        extendedName += ' ' + part;
       }
     }
+    if (extendedName !== EMPTY_STRING) {
+      brandsWithExtendedNames[extendedName.trim()] = [...brands[brand]];
+    } else {
+      brandsWithExtendedNames[brand] = [...brands[brand]];
+    }
   }
-  return specificatedBrands;
+  return brandsWithExtendedNames;
 };
 
 const productDataNormalize = (products: Product[]) => {
