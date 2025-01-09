@@ -22,7 +22,7 @@ export class AtbScraper extends Scraper {
         const oldPrice = oldPriceElement?.innerText ?? null;
 
         const titleElement = e.querySelector<HTMLElement>('.catalog-item__title');
-        if(!titleElement) {
+        if (!titleElement) {
           continue;
         }
         const title = titleElement.innerText;
