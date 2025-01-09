@@ -1,11 +1,11 @@
-import {Product} from "../data/types";
+import { Product } from '../data/types';
 
 export class Scraper {
   public wait = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
   public filterDuplicateProducts = (products: Product[]): Product[] => {
     const filteredProducts: Product[] = [];
-    for(const product of products) {
+    for (const product of products) {
       this.addProduct(filteredProducts, product);
     }
     return filteredProducts;
