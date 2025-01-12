@@ -1,6 +1,7 @@
 import { Browser } from 'puppeteer-core';
 import { Scraper } from './scraper';
 import { Product } from '../data/types';
+import { setTimeout } from 'node:timers/promises';
 
 const URL = 'https://fora.ua/category/energetychni-napoi-2486';
 const MARKETPLACE = 'Фора';
@@ -10,7 +11,7 @@ export class ForaScraper extends Scraper {
   public scrap = async (browser: Browser): Promise<Product[]> => {
     const page = await browser.newPage();
     await page.goto(URL);
-    await this.wait(TWO_SECONDS);
+    await setTimeout(TWO_SECONDS);
     const parsedData = await page.evaluate((marketplace: string) => {
       const products:Product[] = [];
       const elements = document.querySelectorAll<HTMLElement>('.product-list-item');
