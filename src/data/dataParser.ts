@@ -2,11 +2,15 @@ import { Data, Product } from './types';
 
 const EMPTY_STRING = '';
 const MIN_PRODUCT_COUNT = 2;
-const NUMBERS_REG_EXP = new RegExp(/\d+/g);
 const LITERS = 'л';
 const MILLILITERS = 'мл';
 const MAX_VOLUME_LENGTH = 4;
 const BASE_MULTIPLIER = 10;
+const NUMBERS_REG_EXP = new RegExp(/\d+/g);
+const SYMBOLS_REG_EPX = new RegExp(/[.,:;!?@#%]+/g);
+const LITRE_VOLUME_REG_EXP = new RegExp(/(^|[^а-яА-Я])л([^а-яА-Я]|$)/i);
+const FLOAT_VOLUME_REG_EXP = new RegExp(/(^|[^0-9])0\d+\s*л([^а-яА-Я]|$)/i);
+const LITRE_OR_MILLILITRE_VOLUME_REG_EXP = new RegExp(/(^|[^а-яА-Я])(л|мл)([^а-яА-Я]|$)/i);
 
 const KEYWORDS  = [
   'напій',
@@ -30,39 +34,38 @@ const brandParser = (products: Product[]): Map<string, Product[]> => {
   const brands: Map<string, Product[]> = new Map();
   for (const product of products) {
     const splitedTitle = product.title.toLowerCase().split(' ');
-    if (brands[splitedTitle[0]]) {
-      brands[splitedTitle[0]].push(product);
+    const firstWordOfBrand = splitedTitle[0];
+    if (brands.has(firstWordOfBrand)) {
+      brands.get(firstWordOfBrand).push(product);
       continue;
     }
-    brands[splitedTitle[0]]= [product];
+    brands.set(firstWordOfBrand, [product]);
   }
 
-  brands['other'] = [];
-  for (const brand in brands) {
-    if (brands[brand].length < MIN_PRODUCT_COUNT) {
-      brands['other'] = [...brands[brand], ...brands['other'] ];
-      delete brands[brand];
+  brands.set('other', []);
+  for (const [brand, products] of brands) {
+    if (products.length < MIN_PRODUCT_COUNT) {
+      brands.get('other').push(...products);
+      brands.delete(brand);
     }
   }
-
   return extendBrandsName(brands);
 };
 
 const extendBrandsName = (brands: Map<string, Product[]>): Map<string, Product[]> => {
   const brandsWithExtendedNames = new Map();
-  for (const brand in brands) {
-    const products = brands[brand];
+  for (const [brand, products] of brands) {
     let extendedName = '';
-    const splitedProductName = brands[brand][0].title.toLowerCase().split(' ');
+    const splitedProductName = products[0].title.toLowerCase().split(' ');
     for (const part of splitedProductName) {
       if (products.every((product: Product) => product.title.toLowerCase().includes(part))) {
         extendedName += ' ' + part;
       }
     }
     if (extendedName !== EMPTY_STRING) {
-      brandsWithExtendedNames[extendedName.trim()] = [...brands[brand]];
+      brandsWithExtendedNames.set(extendedName.trim(), [...brands.get(brand)]);
     } else {
-      brandsWithExtendedNames[brand] = [...brands[brand]];
+      brandsWithExtendedNames.set(brand, [...brands.get(brand)]);
     }
   }
   return brandsWithExtendedNames;
@@ -77,24 +80,19 @@ const productDataNormalize = (products: Product[]) => {
 };
 
 const volumeParser = (products: Product[]): Product[] => {
-  const symbolsRegEpx = new RegExp(/[.,:;!?@#%]+/g);
-  const litreVolumeRegExp = new RegExp(/(^|[^а-яА-Я])л([^а-яА-Я]|$)/i);
-  const floatVolumeRegExp = new RegExp(/(^|[^0-9])0\d+\s*л([^а-яА-Я]|$)/i);
-  const litreOrMillilitreVolumeRegExp = new RegExp(/(^|[^а-яА-Я])(л|мл)([^а-яА-Я]|$)/i);
-
   for (const product of products) {
-    product.title = product.title.replace(symbolsRegEpx, EMPTY_STRING);
-    if (product.title.match(floatVolumeRegExp)) {
+    product.title = product.title.replace(SYMBOLS_REG_EPX, EMPTY_STRING);
+    if (product.title.match(FLOAT_VOLUME_REG_EXP)) {
       const numbers = product.title.match(NUMBERS_REG_EXP);
       product.title = product.title.replace(NUMBERS_REG_EXP, EMPTY_STRING).trim();
       const volumeInString = numbers[numbers.length-1];
       product.volume = volumeDimensionalityFormatter(volumeInString);
-    } else if (product.title.match(litreVolumeRegExp)) {
+    } else if (product.title.match(LITRE_VOLUME_REG_EXP)) {
       assingVolume(product, LITERS);
     } else if (product.title.match(NUMBERS_REG_EXP)) {
       assingVolume(product, MILLILITERS);
     }
-    product.title = product.title.replace(litreOrMillilitreVolumeRegExp, EMPTY_STRING).trim();
+    product.title = product.title.replace(LITRE_OR_MILLILITRE_VOLUME_REG_EXP, EMPTY_STRING).trim();
   }
   return products;
 };
@@ -115,7 +113,7 @@ const filterAndTransformData =  (data: Product[], scrapedMarketplaces: string[])
   const products = volumeParser(normalizedProducts);
   const brands = brandParser(products);
   return {
-    brands: brands,
+    brands: Object.fromEntries(brands),
     marketplaces: scrapedMarketplaces,
   };
 };

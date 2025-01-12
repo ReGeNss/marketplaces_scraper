@@ -1,6 +1,7 @@
 import { Browser } from 'puppeteer-core';
 import { Scraper } from './scraper';
 import { Product } from '../data/types';
+import { setTimeout } from 'node:timers/promises';
 
 const URL = 'https://silpo.ua/category/energetychni-napoi-59';
 const MARKETPLACE = 'Сільпо';
@@ -11,9 +12,9 @@ export class SilpoScraper extends Scraper {
   public scrap = async (browser: Browser): Promise<Product[]> => {
     const page = await browser.newPage();
     await page.goto(URL);
-    await this.wait(FOUR_SECONDS);
+    await setTimeout(FOUR_SECONDS);
     await page.click('body > sf-shop-silpo-root > shop-silpo-root-shell > silpo-shell-main > div > div.main__body > silpo-category > silpo-catalog > div > div.container.catalog__products > div > ecomui-pagination > div > button > div');
-    await this.wait(TWO_SECONDS);
+    await setTimeout(TWO_SECONDS);
     const parsedData: Product[] = await page.evaluate((marketplace) => {
       const products: Product[] = [];
       const elements = document.querySelectorAll<HTMLElement>('.ng-star-inserted');

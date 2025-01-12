@@ -1,6 +1,7 @@
 import { Browser } from 'puppeteer-core';
 import { Scraper } from './scraper';
 import { Product } from '../data/types';
+import { setTimeout } from 'node:timers/promises';
 
 const URL = 'https://novus.zakaz.ua/uk/categories/energy-drinks/';
 const MARKETPLACE = 'Новус';
@@ -11,10 +12,10 @@ export class NovusScraper extends Scraper {
   public scrap = async (browser: Browser): Promise<Product[]> => {
     const page = await browser.newPage();
     await page.goto(URL);
-    await this.wait(FOUR_SECONDS);
+    await setTimeout(FOUR_SECONDS);
     for (let i = 0 ; i < PAGEDOWN_COUNT ; i++) {
       await page.click('#PageWrapBody_desktopMode > div.jsx-e14abeb0dec5e794.CategoryProductBox__loadMore > button');
-      await this.wait(FOUR_SECONDS);
+      await setTimeout(FOUR_SECONDS);
     }
     const parsedData: Product[] = await page.evaluate((marketplace) => {
       const products: Product[] = [];

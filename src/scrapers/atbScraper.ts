@@ -1,6 +1,7 @@
 import { Browser } from 'puppeteer-core';
 import { Scraper } from './scraper';
 import { Product } from '../data/types';
+import { setTimeout } from 'node:timers/promises';
 
 const MARKETPLACE = 'ATB';
 const URL = 'https://www.atbmarket.com/catalog/364-yenergetichni';
@@ -11,7 +12,7 @@ export class AtbScraper extends Scraper {
     const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36');
     await page.goto(URL);
-    await this.wait(THREE_SECONDS);
+    await setTimeout(THREE_SECONDS);
     const parsedData = await page.evaluate((marketplace: string) => {
       const products:Product[] =[];
       const elements = document.querySelectorAll<HTMLElement>('.catalog-item');
