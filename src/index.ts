@@ -1,7 +1,8 @@
-import { app } from '@azure/functions';
 import * as dotenv from 'dotenv';
+import startServer from './server';
+import startSchedule from './schedule';
 
-dotenv.config();
-app.setup({
-  enableHttpStream: true,
-});
+dotenv.config({ path: __dirname+'/../.env' });
+startServer();
+startSchedule();
+
