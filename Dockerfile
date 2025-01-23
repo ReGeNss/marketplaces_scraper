@@ -1,15 +1,62 @@
-# To enable ssh & remote debugging on app service change the base image to the one below
-# FROM mcr.microsoft.com/azure-functions/node:4-node20-appservice
-FROM mcr.microsoft.com/azure-functions/node:4-node20
+FROM node:18-alpine
 
-ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
-    AzureFunctionsJobHost__Logging__Console__IsEnabled=true
+# Install Chromium and dependencies
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    freetype-dev \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    dumb-init \
+    udev \
+    ttf-liberation \
+    font-noto-emoji \
+    fontconfig
 
-WORKDIR /home/site/wwwroot
+# Create and set working directory
+WORKDIR /app
 
-RUN apt-get install -y libglib2.0-0 libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libxkbcommon0 libpango-1.0-0 libcairo2 libasound2
-RUN apt-get install -y fonts-noto-cjk fonts-noto-color-emoji fonts-noto-core fonts-noto-ui-core
-COPY . /home/site/wwwroot
+# Add a non-root user and setup Chrome directories
+RUN addgroup -S pptruser && adduser -S -G pptruser pptruser \
+    && mkdir -p /home/pptruser/Downloads \
+    && mkdir -p /app/.chrome/tmp \
+    && mkdir -p /app/.chrome/data \
+    && mkdir -p /app/.cache/puppeteer \
+    && chown -R pptruser:pptruser /home/pptruser \
+    && chown -R pptruser:pptruser /app
 
-RUN cd /home/site/wwwroot && \
-    npm install
+# Change to non-root user
+USER pptruser
+
+# Set environment variables
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
+    PUPPETEER_DISABLE_DEV_SHM_USAGE=true \
+    CHROME_PATH=/usr/bin/chromium-browser \
+    CHROME_DEVEL_SANDBOX=/usr/local/sbin/chrome-devel-sandbox \
+    NODE_ENV=production \
+    PUPPETEER_CACHE_DIR=/app/.cache/puppeteer
+
+# Copy package files with correct ownership
+COPY --chown=pptruser:pptruser package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application with correct ownership
+COPY --chown=pptruser:pptruser tsconfig.json ./
+COPY --chown=pptruser:pptruser . ./
+
+# Compile TypeScript
+RUN npx tsc
+
+# Expose the port
+EXPOSE 3000
+
+# Use dumb-init to handle zombie processes
+ENTRYPOINT ["dumb-init", "--"]
+
+# Start the app
+CMD ["npm", "start"]
