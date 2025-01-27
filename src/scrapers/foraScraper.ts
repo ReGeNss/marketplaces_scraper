@@ -3,15 +3,16 @@ import { Scraper } from './scraper';
 import { Product } from '../data/types';
 import { setTimeout } from 'node:timers/promises';
 
-const URL = 'https://fora.ua/category/energetychni-napoi-2486';
+const SITE_URL = 'https://fora.ua/category';
 const MARKETPLACE = 'Фора';
 const TWO_SECONDS = 2000;
 
 export class ForaScraper extends Scraper {
-  public scrap = async (browser: Browser): Promise<Product[]> => {
+  public scrap = async (browser: Browser, route: string): Promise<Product[]> => {
+    const url = `${SITE_URL}/${route}`;
     const page = await browser.newPage();
     try {
-      await page.goto(URL, { timeout: this.timeout });
+      await page.goto(url, { timeout: this.timeout });
       await setTimeout(TWO_SECONDS);
       const parsedData = await page.evaluate((marketplace: string) => {
         const products:Product[] = [];

@@ -1,4 +1,4 @@
-import { Data, Product } from './types';
+import { Category, Product } from './types';
 
 const EMPTY_STRING = '';
 const MIN_PRODUCT_COUNT = 2;
@@ -27,7 +27,10 @@ const KEYWORDS  = [
   'сильногазований',
   'ПЕТ',
   'з/б',
+  'п/е',
   'середньогазований',
+  'г',
+  'з',
 ];
 
 const brandParser = (products: Product[]): Map<string, Product[]> => {
@@ -104,18 +107,29 @@ const volumeDimensionalityFormatter = (volume: string): string => {
 
 const assingVolume = (product: Product, measurementUnit: string): void => {
   const volume = product.title.match(NUMBERS_REG_EXP);
+  if (!volume) return;
   product.title = product.title.replace(NUMBERS_REG_EXP, EMPTY_STRING).trim();
   product.volume = volume[0] + ' ' + measurementUnit;
+
 };
 
-const filterAndTransformData =  (data: Product[], scrapedMarketplaces: string[]): Data =>  {
-  const normalizedProducts = productDataNormalize(data);
-  const products = volumeParser(normalizedProducts);
-  const brands = brandParser(products);
-  return {
-    brands: Object.fromEntries(brands),
-    marketplaces: scrapedMarketplaces,
-  };
+const filterAndTransformData =  (data: Product[], scrapedMarketplaces: string[]): Category =>  {
+  try {
+    const normalizedProducts = productDataNormalize(data);
+    const products = volumeParser(normalizedProducts);
+    const brands = brandParser(products);
+    return {
+      brands: Object.fromEntries(brands),
+      marketplaces: scrapedMarketplaces,
+    };
+  } catch (e) {
+    console.error('Data parsing failed: ' + e);
+    return {
+      brands: {},
+      marketplaces: scrapedMarketplaces,
+    };
+  }
+
 };
 
 export default filterAndTransformData;

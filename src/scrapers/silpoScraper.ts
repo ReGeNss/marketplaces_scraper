@@ -3,16 +3,17 @@ import { Scraper } from './scraper';
 import { Product } from '../data/types';
 import { setTimeout } from 'node:timers/promises';
 
-const URL = 'https://silpo.ua/category/energetychni-napoi-59';
+const SITE_URL = 'https://silpo.ua/category';
 const MARKETPLACE = 'Сільпо';
 const FOUR_SECONDS = 4000;
 const TEN_SECONDS = 10000;
 
 export class SilpoScraper extends Scraper {
-  public scrap = async (browser: Browser): Promise<Product[]> => {
+  public scrap = async (browser: Browser, route: string): Promise<Product[]> => {
+    const url = `${SITE_URL}/${route}`;
     const page = await browser.newPage();
     try {
-      await page.goto(URL, { timeout: this.timeout });
+      await page.goto(url, { timeout: this.timeout });
       await setTimeout(FOUR_SECONDS);
       await page.click('body > sf-shop-silpo-root > shop-silpo-root-shell > silpo-shell-main > div > div.main__body > silpo-category > silpo-catalog > div > div.container.catalog__products > div > ecomui-pagination > div > button > div');
       await setTimeout(TEN_SECONDS);
@@ -21,6 +22,7 @@ export class SilpoScraper extends Scraper {
         const elements = document.querySelectorAll<HTMLElement>('.ng-star-inserted');
         for (const e of elements) {
           if (!e) continue;
+          if (e.querySelector<HTMLElement>('.cart-soldout ng-star-inserted') !== null) continue;
           const currentPriceElement = e.querySelector<HTMLElement>('.ft-whitespace-nowrap');
           if (currentPriceElement == null) {
             continue;
@@ -43,6 +45,7 @@ export class SilpoScraper extends Scraper {
       }, MARKETPLACE);
       return this.filterDuplicateProducts(parsedData);
     } catch (e) {
+      console.log('Scraping failed in ' + MARKETPLACE + ' ' + e);
       throw Error('Scraping failed in ' + MARKETPLACE + ' ' + e);
     } finally {
       await page.close();

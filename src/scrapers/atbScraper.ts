@@ -3,14 +3,20 @@ import { Scraper } from './scraper';
 import { Product } from '../data/types';
 
 const MARKETPLACE = 'АТБ';
-const URL = 'https://www.atbmarket.com/catalog/364-yenergetichni';
+const SITE_URL = 'https://www.atbmarket.com/catalog';
 
 export class AtbScraper extends Scraper {
-  public scrap = async (browser: Browser): Promise<Product[]> => {
+  public scrap = async (browser: Browser, route: string): Promise<Product[]> => {
+    const url = `${SITE_URL}/${route}`;
     const page = await browser.newPage();
+    await page.setCookie({
+      name: 'birthday',
+      value: 'true',
+      domain: '.www.atbmarket.com',
+    });
     try {
       await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36');
-      await page.goto(URL, { timeout: this.timeout });
+      await page.goto(url, { timeout: this.timeout });
       const parsedData = await page.evaluate((marketplace: string) => {
         const products:Product[] =[];
         const elements = document.querySelectorAll<HTMLElement>('.catalog-item');
