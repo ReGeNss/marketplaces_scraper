@@ -1,4 +1,4 @@
-export interface Data {
+export interface Category {
   marketplaces: string[],
   brands: {[k: string]: Product[]},
 }
@@ -10,4 +10,8 @@ export interface Product {
   oldPrice?: string,
   imgSrc?: string,
   volume?: string;
+}
+
+export interface FormattedData {
+  [k: string]: Category,
 }

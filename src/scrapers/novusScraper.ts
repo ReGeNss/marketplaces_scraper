@@ -3,18 +3,26 @@ import { Scraper } from './scraper';
 import { Product } from '../data/types';
 import { setTimeout } from 'node:timers/promises';
 
-const URL = 'https://novus.zakaz.ua/uk/categories/energy-drinks/';
+const SITE_URL = 'https://novus.zakaz.ua/uk/categories';
 const MARKETPLACE = 'Новус';
 const FOUR_SECONDS = 4000;
-const PAGEDOWN_COUNT = 2;
+const PAGEDOWN_COUNT = 20;
 
 export class NovusScraper extends Scraper {
-  public scrap = async (browser: Browser): Promise<Product[]> => {
+  public scrap = async (browser: Browser, route: string): Promise<Product[]> => {
+    const url = `${SITE_URL}/${route}`;
     const page = await browser.newPage();
+    await page.evaluateOnNewDocument(() => {
+      localStorage.setItem('confirmedAge', 'confirmed');
+    });
     try {
-      await page.goto(URL, { timeout: this.timeout });
+      await page.goto(url, { timeout: this.timeout });
       await setTimeout(FOUR_SECONDS);
       for (let i = 0 ; i < PAGEDOWN_COUNT ; i++) {
+        const buttonExists = await page.$('#PageWrapBody_desktopMode > div.jsx-e14abeb0dec5e794.CategoryProductBox__loadMore > button');
+        if (!buttonExists) {
+          break;
+        }
         await page.click('#PageWrapBody_desktopMode > div.jsx-e14abeb0dec5e794.CategoryProductBox__loadMore > button');
         await setTimeout(FOUR_SECONDS);
       }
@@ -23,6 +31,7 @@ export class NovusScraper extends Scraper {
         const elements = document.querySelectorAll<HTMLElement>('.ProductsBox__listItem');
         for (const e of elements) {
           if (!e) continue;
+          if (e.querySelector<HTMLElement>('.Price__value_unavailable') !== null) continue;
           const currentPriceElement = e.querySelector<HTMLElement>('.Price__value_caption');
           if (!currentPriceElement) {
             continue;

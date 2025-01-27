@@ -2,7 +2,6 @@ import { Product } from '../data/types';
 
 export class Scraper {
   public timeout = 300000;
-
   public filterDuplicateProducts = (products: Product[]): Product[] => {
     const filteredProducts: Product[] = [];
     for (const product of products) {

@@ -2,7 +2,7 @@ import { scheduleJob } from 'node-schedule';
 import scrapMarketplacesTrigger from './scrapMarketplacesTrigger';
 
 export default function startSchedule () {
-  const job = scheduleJob('0 */5 * * *', async () => {
+  const job = scheduleJob('0 */12 * * *', async () => {
     console.log('start schedule scraping');
     try {
       await scrapMarketplacesTrigger();
@@ -10,6 +10,5 @@ export default function startSchedule () {
     } catch (e) {
       console.log('Scraping failed ' + e);
     }
-
   });
 }
