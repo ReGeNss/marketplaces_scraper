@@ -5,7 +5,7 @@ import { setTimeout } from 'node:timers/promises';
 
 const SITE_URL = 'https://fora.ua/category';
 const MARKETPLACE = 'Фора';
-const TWO_SECONDS = 2000;
+const ONE_MINUTE = 60000;
 
 export class ForaScraper extends Scraper {
   public scrap = async (browser: Browser, route: string): Promise<Product[]> => {
@@ -13,7 +13,7 @@ export class ForaScraper extends Scraper {
     const page = await browser.newPage();
     try {
       await page.goto(url, { timeout: this.timeout });
-      await setTimeout(TWO_SECONDS);
+      await setTimeout(ONE_MINUTE);
       const parsedData = await page.evaluate((marketplace: string) => {
         const products:Product[] = [];
         const elements = document.querySelectorAll<HTMLElement>('.product-list-item');

@@ -6,14 +6,14 @@ export default function startServer () {
   const app = express();
 
   app.post('/scrap', async (req, res) => {
-    console.log('start');
+    console.log('========start=======');
     try {
       const data = await scrapMarketplacesTrigger();
       res.status(201).setHeader('Content-Type', 'application/json').send(JSON.stringify(data));
     } catch (e) {
       res.status(500).send('Scraping failed: ' + e);
     }
-    console.log('scrapped');
+    console.log('======scrapped======');
   });
 
   app.get('/categories', (req, res) => {
