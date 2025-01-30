@@ -49,8 +49,8 @@ const createBrowser = async (): Promise<Browser> => {
       '--disable-extensions',
       '--disable-software-rasterizer',
     ],
-    executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\Chrome.exe',
-    // executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+    // executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\Chrome.exe',
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
   });
 };
 

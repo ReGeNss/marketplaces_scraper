@@ -12,5 +12,13 @@ export default async function scrapMarketplacesTrigger (): Promise<FormattedData
     formattedData[category] = dataParser(scrapedData[category], marketplaces);
   }
   await saveData(formattedData);
+  let amount = 0;
+  for (const category in formattedData) {
+    const brands = formattedData[category].brands;
+    for (const brand in brands) {
+      amount+= brands[brand].length;
+    }
+  }
+  console.log('SCRAPED: ', amount);
   return formattedData;
 }
